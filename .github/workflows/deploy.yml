@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: Print GitHub Variables
         run: |
-          echo "user: $DOCKER_HUB_USERNAME"
-          echo "pass: $DOCKER_HUB_PASSWORD"
+          echo "user: ${{ secrets.DOCKER_HUB_USERNAME }}"
+          echo "pass: ${{ secrets.DOCKER_HUB_PASSWORD }}"
 
   build-and-push:
     runs-on: ubuntu-latest
