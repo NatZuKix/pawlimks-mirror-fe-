@@ -51,6 +51,14 @@ jobs:
       - name: Decode VPN CA certificate
         run: echo "${{ secrets.VPN_CA_CERT }}" | base64 --decode > vpn-st_ca.crt
 
+      - name: Create VPN credentials file
+        run: |
+          echo "${{ secrets.VPN_USERNAME }}" > vpn-auth.txt
+          echo "${{ secrets.VPN_PASSWORD }}" >> vpn-auth.txt
+
+      - name: Update VPN config to use auth file
+        run: echo "auth-user-pass vpn-auth.txt" >> sitst-client.ovpn
+
       - name: Connect to VPN
         run: sudo openvpn --config sitst-client.ovpn --ca vpn-st_ca.crt --daemon
 
