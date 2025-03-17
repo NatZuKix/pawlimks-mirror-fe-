@@ -34,4 +34,4 @@ jobs:
           context: .
           file: ./Dockerfile  # Change if your Dockerfile is elsewhere
           push: true
-          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pawslink:latest
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/frontend:latest
