@@ -36,19 +36,26 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pawslink:latest
 
-  # deploy:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
+  connect-vpn:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  #   steps:
-  #     - name: SSH into Server and Deploy
-  #       uses: appleboy/ssh-action@v0.1.10
-  #       with:
-  #         host: ${{ secrets.SERVER_HOST }}
-  #         username: ${{ secrets.SERVER_USER }}
-  #         key: ${{ secrets.SERVER_SSH_KEY }}
-  #         script: |
-  #           docker pull your-dockerhub-username/react-app:latest
-  #           docker stop react-app || true
-  #           docker rm react-app || true
-  #           docker run -d -p 80:80 --name react-app your-dockerhub-username/react-app:latest
+      - name: Install OpenVPN
+        run: sudo apt-get update && sudo apt-get install -y openvpn
+
+      - name: Decode VPN client config
+        run: echo "${{ secrets.VPN_CLIENT_CONFIG }}" | base64 --decode > sitst-client.ovpn
+
+      - name: Decode VPN CA certificate
+        run: echo "${{ secrets.VPN_CA_CERT }}" | base64 --decode > vpn-st_ca.crt
+
+      - name: Connect to VPN
+        run: sudo openvpn --config sitst-client.ovpn --ca vpn-st_ca.crt --daemon
+
+      - name: Wait for VPN connection
+        run: sleep 10
+
+      - name: Check Docker status
+        run: docker ps
