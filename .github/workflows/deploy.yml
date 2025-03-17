@@ -35,37 +35,3 @@ jobs:
           file: ./dockerfile-front  # Change if your Dockerfile is elsewhere
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pawslink:latest
-
-  connect-vpn:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install OpenVPN
-        run: sudo apt-get update && sudo apt-get install -y openvpn
-
-      - name: Decode VPN client config
-        run: echo "${{ secrets.VPN_CLIENT_CONFIG }}" | base64 --decode > sitst-client.ovpn
-
-      - name: Decode VPN CA certificate
-        run: echo "${{ secrets.VPN_CA_CERT }}" | base64 --decode > vpn-st_ca.crt
-
-      - name: Create VPN credentials file
-        run: |
-          echo "${{ secrets.VPN_USERNAME }}" > vpn-auth.txt
-          echo "${{ secrets.VPN_PASSWORD }}" >> vpn-auth.txt
-
-      - name: Update VPN config to use auth file
-        run: echo "auth-user-pass vpn-auth.txt" >> sitst-client.ovpn
-
-      - name: Connect to VPN
-        run: sudo openvpn --config sitst-client.ovpn --ca vpn-st_ca.crt --daemon
-
-      - name: Wait for VPN connection
-        run: sleep 10
-
-      - name: Connect to SSH and Run Docker PS
-        run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "docker ps"
-
