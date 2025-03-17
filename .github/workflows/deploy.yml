@@ -32,7 +32,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: ./front/dockerfile-front  # Change if your Dockerfile is elsewhere
+          file: ../../front/dockerfile-front  # Change if your Dockerfile is elsewhere
           push: true
           tags: ${{ secrets.DOCKER_HUB_USERNAME }}/pawslink:latest
 
